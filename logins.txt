@@ -1,0 +1,2 @@
+[user][parola]
+[user1][parola1]
