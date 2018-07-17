@@ -1,2 +1,2 @@
-[user][parola]
-[user1][parola1]
+[Cosmin][Cosmin1]
+[Cosmin][Cosmin1]
