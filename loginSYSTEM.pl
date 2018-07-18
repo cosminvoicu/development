@@ -75,7 +75,7 @@ if($logout =~ /Y/)
         }
     else
     {
-        last
+        last;
     }
 }
 else
