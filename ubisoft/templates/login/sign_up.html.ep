@@ -1,0 +1,14 @@
+
+%= form_for 'do_sign_up' => (method => 'POST') => begin
+%= label_for username => 'Username'
+%= text_field 'username'
+
+%= label_for password => 'Password'
+%= password_field 'password'
+
+%= submit_button 'Sign Up', class => 'btn'
+% end
+%if (stash('user_wrong') eq 'wrong') {
+<p>Error: The user or password is wrong. Please try again!</p>
+%}
+
