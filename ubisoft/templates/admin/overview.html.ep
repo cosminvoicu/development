@@ -1,1 +1,23 @@
-restricted area
+
+%= form_for 'on_logout' => (method => 'POST') => begin
+
+%= submit_button 'Logout', class => 'btn'
+
+% end
+
+%= form_for 'add_account' => (method => 'POST') => begin
+%= label_for username => 'Username'
+%= text_field 'username'
+
+%= label_for account => 'Account name'
+%= text_field 'account'
+
+%= submit_button 'Add account on the page', class => 'btn'
+% end
+
+<p><%=  stash('accounts')%></p>
+
+
+
+
+

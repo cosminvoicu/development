@@ -1,6 +1,6 @@
 package Ubisoft;
 use Mojo::Base 'Mojolicious';
-use  Ubisoft::Schema;
+
 
 # This method will run once at server start
 sub startup {
@@ -24,25 +24,19 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
-    $r->get('/')->to('home#welcome');
-    $r->get('/login')->name('login_form')->to(template => 'login/login_form');
-    $r->post('/login')->name('do_login')->to('Login#on_user_login');
-    $r->get('/sign_up')->to(template => 'login/sign_up');
-    $r->post('/sign_up')->name('do_sign_up')->to('Login#sign_up');
-    $r->post('/login')->to('Login#on_user_login');
-    my $authorized = $r->under('/admin')->to('Login#is_logged_in');
-    $authorized->get('/')->name('restricted_area')->to(template => 'admin/overview');
+    $r -> get('/')->to('home#welcome');
+    $r -> get('/login') -> name('login_form') -> to(template => 'login/login_form');
+    $r -> post('/login') -> name('do_login') -> to('Login#on_user_login');
+    $r -> get('/sign_up') -> to(template => 'login/sign_up');
+    $r -> post('/sign_up') -> name('do_sign_up') -> to('Login#sign_up');
+    $r -> post('/') -> name('on_logout') -> to('Login#on_logout');
+    $r -> post('/admin') -> name('add_account') -> to('Login#add_account') -> to(template => 'admin/overview');
+    $r -> get('/admin') -> to(template => 'admin/overview');
     
-    # Logout route
-        $r->route('/logout')->name('do_logout')->to(cb => sub {
-        my $self = shift;
-        
-        # Expire the session (deleted upon next request)
-        $self->session(expires => 1);
-        
-        # Go back to home
-        $self->redirect_to('home');
-    });
+   
+    my $authorized = $r -> under('/admin') -> to('Login#is_logged_in');
+    $authorized->get('/') -> name('restricted_area') -> to(template => 'admin/overview');
+    
 }
 
 1;
