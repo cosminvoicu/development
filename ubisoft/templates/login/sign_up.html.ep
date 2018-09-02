@@ -45,11 +45,9 @@ float: right;
 
 <div class="topnav">
 <a class="active" href="/">Home</a>
-<a href="/contact">Contact</a>
 <div class="topnav-right">
 <a href="/sign_up"> Sign Up</a>
 <a href="/login">Login</a>
-<a href="#about">About</a>
 </div>
 </div>
 

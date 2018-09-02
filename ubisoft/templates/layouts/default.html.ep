@@ -1,7 +1,5 @@
-
 <!DOCTYPE html>
 <html>
-
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -51,26 +49,8 @@ float: right;
 </div>
 
 <div style="padding-left:16px">
-%= form_for 'do_login' => (method => 'POST') => begin
-%= label_for username => 'Username'
-%= text_field 'username'
 
-%= label_for password => 'Password'
-%= password_field 'password'
 
-%= submit_button 'Log me in', class => 'btn'
-% end
-% my $error = stash "error";
-
-<% if(defined $error) { %>
-<div class="alert alert-danger" role="alert">
-<left>
-<strong>
-<%= $error %>
-</strong>
-</left>
-</div>
-<% } %>
-</div>
 </body>
 </html>
+

@@ -3,17 +3,13 @@ package Ubisoft::Login;
 use Mojo::Base 'Mojolicious::Controller';
 use DBIx::Simple;
 use Mojo::Pg;
+use Ubisoft::Schema;
+
 
 my $user_wrong;
-
-#database connection variables
-my $database="test";
-my $user_db="postgres";
-my $password_db="test";
-my $host='127.0.0.1';
-#connect to database
-my $db = DBIx::Simple->connect('dbi:Pg:dbname="test"',$user_db,$password_db)
-or die DBIx::Simple->error;
+my $schema = Ubisoft::Schema -> getConnection();
+my $usersResultSet = $schema -> resultset('Users');
+my $accountResultSet = $schema -> resultset('Accounts');
 
 
 sub is_logged_in {
@@ -41,10 +37,9 @@ sub user_exists {
     my ($username, $password) = @_;
     chomp $username;
     chomp $password;
-    my $check = $db -> query("SELECT 1 FROM USERS_TBL WHERE user_id like ('$username%') and pswd like ('$password%')");
-    $check = $check->text;
+    my $check = $usersResultSet -> search({username => $username, password => $password}) -> count;
     
-    if($check == 1)
+    if($check == 1 )
     {
         return 1;
     }
@@ -72,7 +67,9 @@ sub on_user_login {
     }
     else
     {
-        $self->render(text => 'Wrong username/password' , status => 403);
+        $self->render('login/login_form',
+                        error => 'User or password wrong',
+                        status => 403);
     }
 
 }
@@ -83,12 +80,11 @@ sub sign_up {
     my $password = $self->param('password');
     chomp $username;
     chomp $password;
-    my $max_id = $db -> query('SELECT MAX(ID) FROM USERS_TBL');
-    $max_id = ($max_id -> text) + 1;
+   
     if ($username =~ /^[a-zA-Z][a-zA-Z0-9_]*$/ and $password =~ /(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).{6,}$/)
     {
     
-        $db -> insert ('users_tbl' , {id => $max_id , user_id => $username , pswd => $password});
+        $usersResultSet -> create({ username => $username , password => $password});
      
     }
     else
@@ -104,30 +100,57 @@ sub sign_up {
 
     sub add_account {
         
-        my $self = shift;
+    my $self = shift;
         
         #get the username and the account from the template
-        my $username  = $self -> param('username');
-        my $account = $self -> param('account');
-        
-        #calculate the max of ID and add 1 to it.
-        my $max_id = $db -> query('SELECT MAX(ID) FROM ACCOUNT');
-        $max_id = ($max_id -> text) + 1;
-        
-        #insert into database
+        my $username  = $self -> session('username');
+        my $username_account = $self -> param('username_account');
+        my $account_type = $self -> param('account_type');
+        my $description = $self -> param ('description');
         
         
-        $db -> insert('account', { id => $max_id , account_id => $username , account_name => $account} );
+        $accountResultSet -> create( { account_type => $account_type,description => $description ,username => $username_account , user_id => $username });
         
-        #select the accounts added and put it into stash
-        my $result = $db -> select ('account' , [ 'account_id' , 'account_name' ]);
+        my @accounts = find_accounts($username);
         
-        $result = $result -> text;
-        
-        $self -> stash('accounts' => $result);
-        
+        return $self -> render('admin/overview', accounts => \@accounts );
         
     }
+    
+    sub find_accounts {
+        my $username = shift;
+        return $accountResultSet -> search( { user_id => $username }) ->all;
+        
+        
+        
+     }
+    
+    sub print_accounts {
+        
+        my $self = shift;
+        
+        my $username = $self -> session('username');
+        
+        my @accounts = find_accounts($username);
+        
+        return $self -> render('admin/overview', accounts => \@accounts );
+        
+    }
+    
+    sub delete_account{
+        
+        my $self = shift;
+        
+        my $id = $self -> param('id');
+        $accountResultSet-> find($id) -> delete;
+        
+        my $username = $self -> session('username');
+        
+        my @accounts = find_accounts($username);
+        
+        return $self -> render('admin/overview', accounts => \@accounts );
+    }
+    
     
 }
 

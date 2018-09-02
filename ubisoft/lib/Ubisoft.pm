@@ -30,8 +30,11 @@ sub startup {
     $r -> get('/sign_up') -> to(template => 'login/sign_up');
     $r -> post('/sign_up') -> name('do_sign_up') -> to('Login#sign_up');
     $r -> post('/') -> name('on_logout') -> to('Login#on_logout');
+    
+    #routes for accounts/add/show/delete
     $r -> post('/admin') -> name('add_account') -> to('Login#add_account') -> to(template => 'admin/overview');
-    $r -> get('/admin') -> to(template => 'admin/overview');
+    $r -> get('/admin') ->name('home')-> to('login#print_accounts');
+    $r -> get('/admin/:id') -> name('delete_account') -> to('login#delete_account');
     
    
     my $authorized = $r -> under('/admin') -> to('Login#is_logged_in');
